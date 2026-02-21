@@ -1,0 +1,53 @@
+package clinicManagement.service.impl;
+
+import clinicManagement.dto.requestDto.WorkingTimeDto;
+import clinicManagement.dto.responseDto.ApiResponse;
+import clinicManagement.entity.DoctorEntity;
+import clinicManagement.entity.WorkingTimeEntity;
+import clinicManagement.exception.AppBadException;
+import clinicManagement.exception.DataNotFoundException;
+import clinicManagement.mapper.WorkingTimeMapper;
+import clinicManagement.repository.DoctorRepository;
+import clinicManagement.repository.WorkingTimeRepository;
+import clinicManagement.service.WorkingTimeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+@Service
+public class WorkingTimeServiceImpl implements WorkingTimeService {
+    private final DoctorRepository doctorRepository;
+    private final WorkingTimeMapper workingTimeMapper;
+    private final WorkingTimeRepository workingTimeRepository;
+
+    public WorkingTimeServiceImpl(DoctorRepository doctorRepository, WorkingTimeMapper workingTimeMapper, WorkingTimeRepository workingTimeRepository) {
+        this.doctorRepository = doctorRepository;
+        this.workingTimeMapper = workingTimeMapper;
+        this.workingTimeRepository = workingTimeRepository;
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> addWorkingTimeWithDoctorId(WorkingTimeDto workingTimeDto, Long doctorId) {
+       DoctorEntity doctorEntity = doctorRepository.findById(doctorId).orElseThrow(() -> new DataNotFoundException("doctor not found"));
+        if(workingTimeRepository.existByDoctorEntity_IdAndDayOfWeekAndIsExpired(doctorId,workingTimeDto.getDayOfWeek(),true)){
+            throw new AppBadException("have a working time for this day");
+        }
+        workingTimeRepository.save( workingTimeMapper.toWorkingTimeEntity(workingTimeDto,doctorEntity));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ApiResponse<>("working time created",true,null,201));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> updateWorkingTimeWithDoctorId(WorkingTimeDto workingTimeDto, Long doctorId) {
+       WorkingTimeEntity workingTime = workingTimeRepository.findByDoctorEntity_IdAndDayOfWeekAndIsExpired(doctorId,workingTimeDto.getDayOfWeek(),true).orElseThrow(()->new DataNotFoundException("not active working time for this day"));
+       workingTime.setStartTime(workingTime.getStartTime());
+       workingTime.setEndTime(workingTime.getEndTime());
+       workingTimeRepository.save(workingTime);
+       return ResponseEntity
+               .status(HttpStatus.OK)
+               .body(new ApiResponse<>("updated",true,null,200));
+    }
+
+
+}
