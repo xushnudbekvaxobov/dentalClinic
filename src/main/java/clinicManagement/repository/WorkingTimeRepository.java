@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface WorkingTimeRepository extends JpaRepository<WorkingTimeEntity,Long> {
     Optional<WorkingTimeEntity> findByDoctorEntity_IdAndDayOfWeekAndIsExpired(Long doctorId, DayOfWeek dayOfWeek, Boolean isExpired);
-    Boolean existByDoctorEntity_IdAndDayOfWeekAndIsExpired(Long doctorId, DayOfWeek dayOfWeek, Boolean isExpired);
+    Boolean existsByDoctorEntity_IdAndDayOfWeekAndIsExpired(Long doctorId, DayOfWeek dayOfWeek, Boolean isExpired);
 }

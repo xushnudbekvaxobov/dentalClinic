@@ -29,7 +29,7 @@ public class WorkingTimeServiceImpl implements WorkingTimeService {
     @Override
     public ResponseEntity<ApiResponse<?>> addWorkingTimeWithDoctorId(WorkingTimeDto workingTimeDto, Long doctorId) {
        DoctorEntity doctorEntity = doctorRepository.findById(doctorId).orElseThrow(() -> new DataNotFoundException("doctor not found"));
-        if(workingTimeRepository.existByDoctorEntity_IdAndDayOfWeekAndIsExpired(doctorId,workingTimeDto.getDayOfWeek(),true)){
+        if(workingTimeRepository.existsByDoctorEntity_IdAndDayOfWeekAndIsExpired(doctorId,workingTimeDto.getDayOfWeek(),true)){
             throw new AppBadException("have a working time for this day");
         }
         workingTimeRepository.save( workingTimeMapper.toWorkingTimeEntity(workingTimeDto,doctorEntity));

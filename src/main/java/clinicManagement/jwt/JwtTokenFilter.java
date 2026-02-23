@@ -1,5 +1,6 @@
 package clinicManagement.jwt;
 
+import clinicManagement.dto.responseDto.JwtDto;
 import clinicManagement.service.impl.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -42,14 +43,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
         final String token = header.substring(7).trim();
         try {
-            Jws<Claims> claimsJws = jwtTokenService.extractToken(token);
-            Claims claims = claimsJws.getPayload();
-            List<String> roles = claims.get("roles", List.class);
-            List<SimpleGrantedAuthority> authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, authorities);
+            JwtDto jwtDto = jwtTokenService.extractToken(token);
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(jwtDto.getUsername(), null, jwtDto.getRoles());
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             filterChain.doFilter(request, response);
