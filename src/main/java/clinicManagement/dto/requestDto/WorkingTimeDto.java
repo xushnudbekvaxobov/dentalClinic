@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Setter
 public class WorkingTimeDto {
     private DayOfWeek dayOfWeek;
-    private LocalDate weekStart;
+    private LocalDate workingDate;
     private String startTime;
     private String endTime;
 }

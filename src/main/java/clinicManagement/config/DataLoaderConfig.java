@@ -6,11 +6,13 @@ import clinicManagement.util.enums.UserRole;
 import clinicManagement.util.enums.UserStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 
+@Configuration
 public class DataLoaderConfig implements CommandLineRunner {
     @Value("${spring.sql.init.mode}")
     private String sqlInitMode;

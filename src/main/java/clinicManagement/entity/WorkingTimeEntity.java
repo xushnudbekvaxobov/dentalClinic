@@ -23,7 +23,7 @@ public class WorkingTimeEntity {
     @Column(nullable = false)
     private DayOfWeek dayOfWeek;
     @Column(nullable = false)
-    private LocalDate weekStart;
+    private LocalDate workingDate;
     @Column(nullable = false)
     private String startTime;
     @Column(nullable = false)

@@ -57,6 +57,7 @@ public class SecurityConfig {
                             .requestMatchers("/auth/forget-password").permitAll()
                             .requestMatchers("/user/change-password").permitAll()
                             .requestMatchers("/user/get-by-id/*").permitAll()
+                            .requestMatchers("/swagger-ui/index.html").permitAll()
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
