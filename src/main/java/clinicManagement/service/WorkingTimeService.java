@@ -14,4 +14,7 @@ public interface WorkingTimeService {
     ResponseEntity<ApiResponse<?>> getPresentWeekWorkingTimeByDoctorId(Long doctorId);
     ResponseEntity<ApiResponse<?>> getLastWeekWorkingTimeByDoctorId(Long doctorId);
     ResponseEntity<ApiResponse<?>> getNextWeekWorkingTimeByDoctorId(Long doctorId);
+    ResponseEntity<ApiResponse<?>> getPresentMonthWorkingTimeByDoctorId(Long doctorId);
+    ResponseEntity<ApiResponse<?>> getLastMonthWorkingTimeByDoctorId(Long doctorId);
+    ResponseEntity<ApiResponse<?>> oneDayWorkingTimeByDoctorId(Long doctorId, LocalDate workingDate);
 }

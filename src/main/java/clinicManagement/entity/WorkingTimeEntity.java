@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "working_time")
@@ -25,9 +26,12 @@ public class WorkingTimeEntity {
     @Column(nullable = false)
     private LocalDate workingDate;
     @Column(nullable = false)
-    private String startTime;
+    private LocalTime startTime;
     @Column(nullable = false)
-    private String endTime;
+    private LocalTime endTime;
+    private LocalTime breakStart;
+    private LocalTime breakEnd;
+    private String reason;
     @Column(nullable = false)
     private Boolean isExpired;
 }

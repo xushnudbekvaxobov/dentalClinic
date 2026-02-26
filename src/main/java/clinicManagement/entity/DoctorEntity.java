@@ -4,6 +4,8 @@ import clinicManagement.util.enums.DoctorStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "doctor")
 @Getter
@@ -18,6 +20,8 @@ public class DoctorEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employeeEntity;
+    @OneToMany(mappedBy = "doctorEntity")
+    private List<WorkingTimeEntity> workingTimeEntity;
     @Column(nullable = false)
     private String speciality;
     @Column(unique = true,nullable = false)

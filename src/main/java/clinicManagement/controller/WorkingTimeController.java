@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/working-time")
 @RequiredArgsConstructor
@@ -28,6 +30,22 @@ public class WorkingTimeController {
         return workingTimeService.getNextWeekWorkingTimeByDoctorId(id);
     }
 
+    @GetMapping("/present-month-working-time/{id}")
+    public ResponseEntity<ApiResponse<?>> getPresentMonthWorkingTime(@PathVariable Long id){
+        return workingTimeService.getPresentMonthWorkingTimeByDoctorId(id);
+    }
+
+    @GetMapping("/last-month-working-time/{id}")
+    public ResponseEntity<ApiResponse<?>> getLastMonthWorkingTime(@PathVariable Long id){
+        return workingTimeService.getLastMonthWorkingTimeByDoctorId(id);
+    }
+
+
+    @GetMapping("/one-day-working-time/{id}/{date}")
+    public ResponseEntity<ApiResponse<?>> getDayWorkingTime(@PathVariable Long id,@PathVariable LocalDate workingDate){
+        return workingTimeService.oneDayWorkingTimeByDoctorId(id,workingDate);
+    }
+    
     @PostMapping("/add-working-time/{id}")
     public ResponseEntity<ApiResponse<?>> addWorkingTime(@RequestBody WorkingTimeDto workingTimeDto,@PathVariable Long id){
         return workingTimeService.addWorkingTime(workingTimeDto,id);

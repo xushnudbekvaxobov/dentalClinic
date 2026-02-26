@@ -3,11 +3,13 @@ package clinicManagement.service.impl;
 import clinicManagement.dto.requestDto.PatientDto;
 import clinicManagement.dto.responseDto.ApiResponse;
 import clinicManagement.entity.PatientEntity;
+import clinicManagement.entity.UserEntity;
 import clinicManagement.exception.DataNotFoundException;
 import clinicManagement.mapper.PatientMapper;
-import clinicManagement.repository.PatentRepository;
+import clinicManagement.repository.PatientRepository;
+import clinicManagement.repository.UserRepository;
 import clinicManagement.service.PatientService;
-import clinicManagement.util.enums.specification.PatientSpecification;
+import clinicManagement.util.specification.PatientSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,19 +18,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class PatientServiceImpl implements PatientService {
-    private final PatentRepository patientRepository;
+    private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final UserRepository userRepository;
 
-    public PatientServiceImpl(PatentRepository patientRepository, PatientMapper patientMapper) {
+    public PatientServiceImpl(PatientRepository patientRepository, PatientMapper patientMapper, UserRepository userRepository) {
         this.patientRepository = patientRepository;
         this.patientMapper = patientMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> addPatient(PatientDto patientDto) {
-       patientRepository.save(patientMapper.toPatientEntity(patientDto));
+    public ResponseEntity<ApiResponse<?>> addPatient(PatientDto patientDto,Long userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(()-> new DataNotFoundException("user not found"));
+        patientRepository.save(patientMapper.toEntity(patientDto,user));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ApiResponse<>("patient created successfully",true,null,201));
@@ -37,7 +44,13 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public ResponseEntity<ApiResponse<?>> updatePatient(PatientDto patientDto, Long id) {
        PatientEntity patientEntity = patientRepository.findById(id).orElseThrow(() -> new DataNotFoundException("patient not found"));
-        patientMapper.toPatientEntityForUpdate(patientEntity,patientDto);
+            patientEntity.setFullName(patientDto.getFullName());
+            patientEntity.setBirthDate(patientDto.getBirthDate());
+            patientEntity.setGender(patientDto.getGender());
+            patientEntity.setPhone(patientDto.getPhone());
+            patientEntity.setAddress(patientDto.getAddress());
+            patientEntity.setCreatedAt(LocalDate.now());
+            patientEntity.setAllergies(patientDto.getAllergies());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>("patient update successfully",true,null,200));

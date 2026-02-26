@@ -18,8 +18,9 @@ public class PatientController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @PostMapping("/create-patient")
-    public ResponseEntity<ApiResponse<?>> addPatient(@RequestBody PatientDto patientDto) {
-        return patientService.addPatient(patientDto);
+    public ResponseEntity<ApiResponse<?>> addPatient(@RequestBody PatientDto patientDto,
+                                                     @RequestParam Long userId) {
+        return patientService.addPatient(patientDto,userId);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")

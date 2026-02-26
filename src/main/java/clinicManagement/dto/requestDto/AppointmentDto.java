@@ -1,16 +1,17 @@
 package clinicManagement.dto.requestDto;
 
-import lombok.Getter;
-import lombok.Setter;
-import java.time.DayOfWeek;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
 @Setter
-public class WorkingTimeDto {
-    private DayOfWeek dayOfWeek;
-    private LocalDate workingDate;
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class AppointmentDto {
+    private LocalDate appointmentDate;
     private LocalTime startTime;
     private LocalTime endTime;
 }

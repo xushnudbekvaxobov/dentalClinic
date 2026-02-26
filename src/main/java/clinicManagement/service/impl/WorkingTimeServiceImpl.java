@@ -11,14 +11,13 @@ import clinicManagement.mapper.WorkingTimeMapper;
 import clinicManagement.repository.DoctorRepository;
 import clinicManagement.repository.WorkingTimeRepository;
 import clinicManagement.service.WorkingTimeService;
-import clinicManagement.service.util.CustomTimeHelper;
+import clinicManagement.util.CustomTimeHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class WorkingTimeServiceImpl implements WorkingTimeService {
@@ -76,21 +75,58 @@ public class WorkingTimeServiceImpl implements WorkingTimeService {
     public ResponseEntity<ApiResponse<?>> getLastWeekWorkingTimeByDoctorId(Long doctorId) {
         if(!doctorRepository.existsById(doctorId)){
             throw new DataNotFoundException("doctor not found");
-        }        LocalDate endDate = CustomTimeHelper.thisWeekStart(LocalDate.now());
+        }
+        LocalDate endDate = CustomTimeHelper.thisWeekStart(LocalDate.now());
+        List<WorkingTimeEntity> workingTimeEntityList = findAllByDateBetweenWithDoctorId(doctorId,endDate,endDate.minusDays(6));
+        List<WorkingTimeResponseDto> responseDtoList = workingTimeEntityList.stream()
+                .map(workingTimeMapper::toWorkingTimeResponseDto).toList();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>("this weeks workingTime",true,findAllByDateBetweenWithDoctorId(doctorId,endDate.minusDays(6),endDate),200));
+                .body(new ApiResponse<>("last weeks workingTime",true,responseDtoList,200));
     }
 
     @Override
     public ResponseEntity<ApiResponse<?>> getNextWeekWorkingTimeByDoctorId(Long doctorId) {
-        DoctorEntity doctorEntity = doctorRepository.findById(doctorId).orElseThrow(()-> new DataNotFoundException("doctor not found"));
+        if(!doctorRepository.existsById(doctorId)){
+            throw new DataNotFoundException("doctor not found");
+        }
         LocalDate startDate = CustomTimeHelper.nextWeekStart(LocalDate.now());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>("this weeks workingTime",true,findAllByDateBetweenWithDoctorId(doctorId,startDate,startDate.plusDays(6)),200));
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<?>> getPresentMonthWorkingTimeByDoctorId(Long doctorId) {
+        LocalDate startDate = CustomTimeHelper.thisMonthStart(LocalDate.now());
+        LocalDate endDate = CustomTimeHelper.endOfMonth(LocalDate.now());
+        List<WorkingTimeEntity> workingTimeEntityList = findAllByDateBetweenWithDoctorId(doctorId,startDate,endDate);
+            List<WorkingTimeResponseDto> responseDtoList = workingTimeEntityList.stream()
+                    .map(workingTimeMapper::toWorkingTimeResponseDto).toList();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>("this month working time",true,responseDtoList,200));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> getLastMonthWorkingTimeByDoctorId(Long doctorId) {
+        LocalDate startDate = CustomTimeHelper.thisMonthStart(LocalDate.now().minusMonths(1));
+        LocalDate endDate = CustomTimeHelper.endOfMonth(LocalDate.now().minusMonths(1));
+        List<WorkingTimeEntity> workingTimeEntityList = findAllByDateBetweenWithDoctorId(doctorId,startDate,endDate);
+        List<WorkingTimeResponseDto> responseDtoList = workingTimeEntityList.stream()
+                .map(workingTimeMapper::toWorkingTimeResponseDto).toList();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>("last month working time",true,responseDtoList,200));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> oneDayWorkingTimeByDoctorId(Long doctorId,LocalDate workingDate) {
+        WorkingTimeEntity workingTimeEntity = workingTimeRepository.findByDoctorEntity_IdAndWorkingDate(doctorId,workingDate).orElseThrow(()->new DataNotFoundException("doctor not found"));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ApiResponse<>("today working time",true,workingTimeMapper.toWorkingTimeResponseDto(workingTimeEntity),200));
+    }
 
     public List<WorkingTimeEntity> findAllByDateBetweenWithDoctorId(Long doctorId,LocalDate startDate,LocalDate endDate){
         return workingTimeRepository.findAllByDoctorEntity_IdAndWorkingDateBetween(doctorId,startDate,endDate);

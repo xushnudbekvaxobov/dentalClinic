@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,7 +17,10 @@ public class WorkingTimeResponseDto{
     private Long doctorId;
     private DayOfWeek dayOfWeek;
     private LocalDate workingDate;
-    private String startTime;
-    private String endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private LocalTime breakStart;
+    private LocalTime breakEnd;
+    private String reason;
     private Boolean isExpired;
 }

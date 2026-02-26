@@ -1,4 +1,4 @@
-package clinicManagement.util.enums.specification;
+package clinicManagement.util.specification;
 
 import clinicManagement.entity.PatientEntity;
 import org.springframework.data.jpa.domain.Specification;

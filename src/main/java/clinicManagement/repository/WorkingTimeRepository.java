@@ -17,6 +17,8 @@ public interface WorkingTimeRepository extends JpaRepository<WorkingTimeEntity,L
 
     Optional<WorkingTimeEntity> findByDoctorEntity_IdAndWorkingDateAndIsExpired(Long doctorId, LocalDate workingDate, Boolean isExpired);
     List<WorkingTimeEntity> findAllByDoctorEntity_IdAndWorkingDateBetween(Long doctorEntity_id,LocalDate startDate, LocalDate endDate);
-    List<WorkingTimeEntity> findAllByWorkingDateBetweenOrderByDoctorEntity(LocalDate workingDateAfter, LocalDate workingDateBefore);
+    List<WorkingTimeEntity> findAllByWorkingDateBetweenOrderByDoctorEntity_Id(LocalDate workingDateAfter, LocalDate workingDateBefore);
+    Optional<WorkingTimeEntity> findByDoctorEntity_IdAndWorkingDate(Long doctorEntityId,LocalDate workingDate);
 
+    Optional<WorkingTimeEntity> findByDoctorEntity_Id(Long doctorEntityId);
 }

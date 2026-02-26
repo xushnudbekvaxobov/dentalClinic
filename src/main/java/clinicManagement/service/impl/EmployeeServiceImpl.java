@@ -3,6 +3,7 @@ package clinicManagement.service.impl;
 import clinicManagement.dto.requestDto.EmployeeCreateDto;
 import clinicManagement.dto.requestDto.EmployeeDto;
 import clinicManagement.dto.responseDto.ApiResponse;
+import clinicManagement.dto.responseDto.EmployeeResponseDto;
 import clinicManagement.entity.EmployeeEntity;
 import clinicManagement.entity.UserEntity;
 import clinicManagement.exception.DataNotFoundException;
@@ -56,17 +57,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public ResponseEntity<ApiResponse<?>> getAllEmployee() {
         List<EmployeeEntity> employeeEntity = employeeRepository.findAll();
+        List<EmployeeResponseDto> employeeResponseDto = employeeEntity.stream().map(employeeMapper::toEmployeeResponseDto).toList();
         return ResponseEntity
                .status(HttpStatus.OK)
-               .body(new ApiResponse<>("getting all employee",true,employeeEntity,200));
+               .body(new ApiResponse<>("getting all employee",true,employeeResponseDto,200));
     }
+
 
     @Override
     public ResponseEntity<ApiResponse<?>> getEmployeeById(Long id) {
         EmployeeEntity employeeEntity = employeeRepository.findById(id).orElseThrow(()->new DataNotFoundException("employee not found"));
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>("getting employee by id",true,employeeEntity,200));
+                .body(new ApiResponse<>("getting employee by id",true,employeeMapper.toEmployeeResponseDto(employeeEntity),200));
     }
 
     @Override

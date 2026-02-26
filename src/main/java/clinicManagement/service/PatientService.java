@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PatientService {
-    ResponseEntity<ApiResponse<?>> addPatient(PatientDto patientDto);
+    ResponseEntity<ApiResponse<?>> addPatient(PatientDto patientDto,Long userId);
     ResponseEntity<ApiResponse<?>> updatePatient(PatientDto patientDto,Long id);
     ResponseEntity<ApiResponse<?>> getAll(Integer page,Integer size);
     ResponseEntity<ApiResponse<?>> getById(Long id);

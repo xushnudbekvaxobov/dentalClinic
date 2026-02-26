@@ -15,13 +15,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT', 'DOCTOR')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT', 'DOCTOR')")
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<ApiResponse<?>> getById(@PathVariable Long id){
         return userService.findById(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PAIENT')")
+//    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PAIENT')")
     @PutMapping("/change-password")
     public ResponseEntity<ApiResponse<?>> changePassword(@RequestParam String email, @RequestParam String newPassword) {
         return userService.changePassword(email, newPassword);

@@ -1,6 +1,7 @@
 package clinicManagement.mapper;
 
 import clinicManagement.dto.requestDto.EmployeeDto;
+import clinicManagement.dto.responseDto.EmployeeResponseDto;
 import clinicManagement.entity.EmployeeEntity;
 import clinicManagement.entity.UserEntity;
 import clinicManagement.util.enums.EmployeeStatus;
@@ -10,7 +11,7 @@ import java.time.LocalDate;
 
 @Component
 public class EmployeeMapper {
-    public EmployeeEntity toEmployeeEntity(EmployeeDto employeeDto, UserEntity userEntity){
+    public EmployeeEntity toEmployeeEntity(EmployeeDto employeeDto, UserEntity userEntity) {
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setUser(userEntity);
         employeeEntity.setFullName(employeeDto.getFullName());
@@ -23,5 +24,20 @@ public class EmployeeMapper {
         employeeEntity.setUpdatedAt(LocalDate.now());
         employeeEntity.setEmployeeStatus(EmployeeStatus.ACTIVE);
         return employeeEntity;
+    }
+
+    public EmployeeResponseDto toEmployeeResponseDto(EmployeeEntity employeeEntity) {
+        return EmployeeResponseDto.builder()
+                .id(employeeEntity.getId())
+                .fullName(employeeEntity.getFullName())
+                .birthDate(employeeEntity.getBirthDate())
+                .gender(employeeEntity.getGender())
+                .phone(employeeEntity.getPhone())
+                .address(employeeEntity.getAddress())
+                .createdAt(employeeEntity.getCreatedAt())
+                .employeeType(employeeEntity.getEmployeeType())
+                .updatedAt(employeeEntity.getUpdatedAt())
+                .employeeStatus(employeeEntity.getEmployeeStatus())
+                .build();
     }
 }

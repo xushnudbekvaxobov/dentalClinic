@@ -2,6 +2,7 @@ package clinicManagement.mapper;
 
 import clinicManagement.dto.requestDto.PatientDto;
 import clinicManagement.entity.PatientEntity;
+import clinicManagement.entity.UserEntity;
 import clinicManagement.util.enums.EmployeeStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,15 +14,13 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class PatientMapper {
-    public PatientEntity toPatientEntity(PatientDto patientDto){
-        PatientEntity patientEntity = new PatientEntity();
-        return toEntity(patientEntity, patientDto);
-    }
-    public PatientEntity toPatientEntityForUpdate(PatientEntity patientEntity,PatientDto patientDto){
-        return toEntity(patientEntity, patientDto);
-    }
+//    public PatientEntity toPatientEntity(PatientDto patientDto){
+//        PatientEntity patientEntity = new PatientEntity();
+//        return toEntity(patientEntity, patientDto);
+//    }
 
-    private PatientEntity toEntity(PatientEntity patientEntity, PatientDto patientDto) {
+    public PatientEntity toEntity(PatientDto patientDto, UserEntity user) {
+        PatientEntity patientEntity = new PatientEntity();
         patientEntity.setFullName(patientDto.getFullName());
         patientEntity.setBirthDate(patientDto.getBirthDate());
         patientEntity.setGender(patientDto.getGender());
@@ -29,6 +28,7 @@ public class PatientMapper {
         patientEntity.setAddress(patientDto.getAddress());
         patientEntity.setCreatedAt(LocalDate.now());
         patientEntity.setAllergies(patientDto.getAllergies());
+        patientEntity.setUser(user);
         return patientEntity;
     }
 
