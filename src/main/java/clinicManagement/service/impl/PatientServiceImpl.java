@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -33,7 +35,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> addPatient(PatientDto patientDto,Long userId) {
+    public ResponseEntity<ApiResponse<?>> addPatient(PatientDto patientDto, UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(()-> new DataNotFoundException("user not found"));
         patientRepository.save(patientMapper.toEntity(patientDto,user));
         return ResponseEntity
@@ -42,14 +44,15 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> updatePatient(PatientDto patientDto, Long id) {
+    public ResponseEntity<ApiResponse<?>> updatePatient(PatientDto patientDto, UUID id) {
        PatientEntity patientEntity = patientRepository.findById(id).orElseThrow(() -> new DataNotFoundException("patient not found"));
-            patientEntity.setFullName(patientDto.getFullName());
+            patientEntity.setFirstName(patientDto.getFirstName());
+            patientEntity.setLastName(patientDto.getLastName());
             patientEntity.setBirthDate(patientDto.getBirthDate());
             patientEntity.setGender(patientDto.getGender());
             patientEntity.setPhone(patientDto.getPhone());
             patientEntity.setAddress(patientDto.getAddress());
-            patientEntity.setCreatedAt(LocalDate.now());
+            patientEntity.setCreatedAt(LocalDateTime.now());
             patientEntity.setAllergies(patientDto.getAllergies());
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -66,7 +69,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> getById(Long id) {
+    public ResponseEntity<ApiResponse<?>> getById(UUID id) {
         PatientEntity patientEntity = patientRepository.findById(id).orElseThrow(() -> new DataNotFoundException("patient not found"));
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PatientEntity extends BaseEntity {
+public class PatientEntity extends BaseProfileEntity{
     private String allergies;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

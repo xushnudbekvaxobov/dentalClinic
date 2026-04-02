@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
@@ -29,7 +31,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> createDoctor(DoctorDto doctorDto,Long employeeId) {
+    public ResponseEntity<ApiResponse<?>> createDoctor(DoctorDto doctorDto, UUID employeeId) {
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).orElseThrow(()->new DataNotFoundException("employee not found"));
         if(doctorRepository.existsByEmployeeEntity_Id(employeeId)){
             throw new AppBadException("doctor already created");
@@ -41,7 +43,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> updateDoctor(DoctorDto doctorDto,Long employeeId) {
+    public ResponseEntity<ApiResponse<?>> updateDoctor(DoctorDto doctorDto, UUID employeeId) {
         if(employeeRepository.existsById(employeeId)){
             throw new AppBadException("employee not found");
         }
@@ -56,7 +58,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> changeStatus(DoctorStatus status,Long employeeId) {
+    public ResponseEntity<ApiResponse<?>> changeStatus(DoctorStatus status, UUID employeeId) {
         if(employeeRepository.existsById(employeeId)){
             throw new AppBadException("employee not found");
         }

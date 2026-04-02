@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class CatalogServiceImpl implements CatalogService {
 
@@ -34,7 +36,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> updateCatalog(Long catalogId, CatalogDto catalogDto) {
+    public ResponseEntity<ApiResponse<?>> updateCatalog(UUID catalogId, CatalogDto catalogDto) {
         CatalogEntity catalogEntity = catalogRepository.findById(catalogId).orElseThrow(()->new DataNotFoundException("catalog not found"));
             catalogEntity.setName(catalogDto.getName());
             catalogEntity.setDescription(catalogDto.getDescription());

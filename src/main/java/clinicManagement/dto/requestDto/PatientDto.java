@@ -9,7 +9,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class PatientDto {
-    public String fullName;
+    public String firstName;
+    public String lastName;
     public LocalDate birthDate;
     public String gender;
     public String phone;

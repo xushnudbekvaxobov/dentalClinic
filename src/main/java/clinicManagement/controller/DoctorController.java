@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/doctor")
 @RequiredArgsConstructor
@@ -16,18 +18,18 @@ public class DoctorController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<?>> create(DoctorDto doctorDto,Long employeeId){
+    public ResponseEntity<ApiResponse<?>> create(DoctorDto doctorDto, UUID employeeId){
         return doctorService.createDoctor(doctorDto,employeeId);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<?>> update(DoctorDto doctorDto,Long employeeId){
+    public ResponseEntity<ApiResponse<?>> update(DoctorDto doctorDto,UUID employeeId){
         return doctorService.updateDoctor(doctorDto,employeeId);
     }
 
 
     @PutMapping("/change-status/{id}/{status}")
-    public ResponseEntity<ApiResponse<?>> changeStatus(@PathVariable Long id, @PathVariable DoctorStatus status){
+    public ResponseEntity<ApiResponse<?>> changeStatus(@PathVariable UUID id, @PathVariable DoctorStatus status){
         return doctorService.changeStatus(status,id);
     }
 }

@@ -36,6 +36,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        String path = request.getRequestURI();
+        if (path.startsWith("/auth/") ||
+                path.startsWith("/swagger-ui/") ||
+                path.startsWith("/v3/api-docs/") ||
+                path.equals("/swagger-ui.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -44,7 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         final String token = header.substring(7).trim();
         try {
             JwtDto jwtDto = jwtTokenService.extractToken(token);
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(jwtDto.getUsername(), null, jwtDto.getRoles());
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(jwtDto.getUsername(), null, List.of(new SimpleGrantedAuthority("ROLE_" + jwtDto.getRoles())));
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             filterChain.doFilter(request, response);

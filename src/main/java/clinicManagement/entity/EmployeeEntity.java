@@ -8,22 +8,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "employee")
+@Table(name = "employees")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeEntity extends BaseEntity{
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+public class EmployeeEntity extends BaseProfileEntity{
+    @Column(nullable = false)
+    private String speciality;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(nullable = true)
+    private UserEntity userEntity;
     @Enumerated(EnumType.STRING)
     private EmployeeType employeeType;
-    @Column(nullable = false)
-    private LocalDate updatedAt;
     @Enumerated(EnumType.STRING)
     private EmployeeStatus employeeStatus;
 }

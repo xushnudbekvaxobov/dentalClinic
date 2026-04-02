@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -17,15 +19,12 @@ public class UserController {
 
 //    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT', 'DOCTOR')")
     @GetMapping("/get-by-id/{id}")
-    public ResponseEntity<ApiResponse<?>> getById(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<?>> getById(@PathVariable UUID id){
         return userService.findById(id);
     }
 
 //    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PAIENT')")
-    @PutMapping("/change-password")
-    public ResponseEntity<ApiResponse<?>> changePassword(@RequestParam String email, @RequestParam String newPassword) {
-        return userService.changePassword(email, newPassword);
-    }
+
 
 
 }

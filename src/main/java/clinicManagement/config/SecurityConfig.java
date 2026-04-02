@@ -57,13 +57,13 @@ public class SecurityConfig {
                             .requestMatchers("/auth/forget-password").permitAll()
                             .requestMatchers("/user/change-password").permitAll()
                             .requestMatchers("/user/get-by-id/*").permitAll()
-                            .requestMatchers("/swagger-ui/index.html").permitAll()
+                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.httpBasic(Customizer.withDefaults());
+        http.httpBasic(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }

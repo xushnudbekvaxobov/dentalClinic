@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Builder
 public class WorkingTimeResponseDto{
-    private Long doctorId;
+    private UUID doctorId;
     private DayOfWeek dayOfWeek;
     private LocalDate workingDate;
     private LocalTime startTime;

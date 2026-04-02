@@ -2,6 +2,7 @@ package clinicManagement.mapper;
 
 import clinicManagement.dto.requestDto.UserDto;
 import clinicManagement.dto.requestDto.UserEmployeeDto;
+import clinicManagement.dto.responseDto.UserResponseDto;
 import clinicManagement.entity.UserEntity;
 import clinicManagement.util.enums.UserRole;
 import clinicManagement.util.enums.UserStatus;
@@ -25,21 +26,22 @@ public class UserMapper {
             UserEntity userEntity = new UserEntity();
             userEntity.setEmail(userDto.getEmail());
             userEntity.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-            userEntity.setRole(UserRole.ROLE_PATIENT);
+            userEntity.setRole(UserRole.PATIENT);
         return getUserEntity(verificationCode, userEntity);
     }
-    public UserEntity toUserEntityForEmployee(UserEmployeeDto userEmployeeDto, String verificationCode) {
+
+    public UserEntity toUserEntityForEmployee(UserEmployeeDto userEmployeeDto) {
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(userEmployeeDto.getEmail());
         userEntity.setPassword(bCryptPasswordEncoder.encode(userEmployeeDto.getPassword()));
         userEntity.setRole(userEmployeeDto.getRole());
-        return getUserEntity(verificationCode, userEntity);
+        return getUserEntity(null, userEntity);
     }
 
     @NonNull
     private UserEntity getUserEntity(String verificationCode, UserEntity userEntity) {
-        userEntity.setCreatedAt(LocalDate.now());
-        userEntity.setUpdatedAt(LocalDate.now());
+        userEntity.setCreatedAt(LocalDateTime.now());
+        userEntity.setUpdatedAt(LocalDateTime.now());
         userEntity.setVerificationCode(verificationCode);
         userEntity.setVerificationCodeGeneratedAt(LocalDateTime.now());
         userEntity.setStatus(UserStatus.NOT_ACTIVE);
@@ -48,6 +50,13 @@ public class UserMapper {
         userEntity.setIsCredentialsNonExpired(true);
         userEntity.setIsEnabled(true);
         return userEntity;
+    }
+    public UserResponseDto toDto(UserEntity userEntity) {
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setId(userEntity.getId());
+        userResponseDto.setEmail(userEntity.getEmail());
+        userResponseDto.setStatus(userEntity.getStatus().toString());
+        return userResponseDto;
     }
 
 }

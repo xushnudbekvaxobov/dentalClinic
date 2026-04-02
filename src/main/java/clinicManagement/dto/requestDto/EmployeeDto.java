@@ -9,10 +9,12 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class EmployeeDto {
-    private String fullName;
+    private String firstName;
+    private String lastName;
     private LocalDate birthDate;
     private String gender;
     private String phone;
     private String address;
+    private String speciality;
     private EmployeeType employeeType;
 }

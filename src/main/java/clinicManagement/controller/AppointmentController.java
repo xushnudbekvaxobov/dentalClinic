@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/appointment")
 @RequiredArgsConstructor
@@ -16,20 +18,20 @@ public class AppointmentController {
 
     @PostMapping("/booking")
     public ResponseEntity<ApiResponse<?>> booking(@RequestBody AppointmentDto appointmentDto,
-                                                  @RequestParam Long patientId,
-                                                  @RequestParam Long doctorId){
+                                                  @RequestParam UUID patientId,
+                                                  @RequestParam UUID doctorId){
         return appointmentService.booking(appointmentDto,patientId,doctorId);
     }
 
     @PutMapping("/change-booking")
     public ResponseEntity<ApiResponse<?>> changeBooking(@RequestBody AppointmentDto appointmentDto,
-                                                  @RequestParam Long patientId,
-                                                  @RequestParam Long doctorId){
+                                                  @RequestParam UUID patientId,
+                                                  @RequestParam UUID doctorId){
         return appointmentService.booking(appointmentDto,patientId,doctorId);
     }
 
     @GetMapping("/get-appointments")
-    public ResponseEntity<ApiResponse<?>> getAppointmentsByDoctorId(@RequestParam Long doctorId) {
+    public ResponseEntity<ApiResponse<?>> getAppointmentsByDoctorId(@RequestParam UUID doctorId) {
         return appointmentService.getAllAppointmentsByDoctorId(doctorId);
     }
 }

@@ -7,13 +7,17 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @Getter
 @Setter
 public class GlobalSettingMapper {
-    public GlobalSettingsEntity toGlobalSettingsEntity(GlobalSettingDto globalSettingDto) {
+    public GlobalSettingsEntity toGlobalSettingsEntity(GlobalSettingDto globalSettingDto, GlobalSettingsEntity globalSettingsEntity1) {
         GlobalSettingsEntity globalSettingsEntity = new GlobalSettingsEntity();
-        globalSettingsEntity.setId(1L);
+        if(globalSettingsEntity1 != null) {
+            globalSettingsEntity = globalSettingsEntity1;
+        }
         globalSettingsEntity.setBreakStart(globalSettingDto.getBreakStart());
         globalSettingsEntity.setBreakEnd(globalSettingDto.getBreakEnd());
         globalSettingsEntity.setReason(globalSettingDto.getReason());

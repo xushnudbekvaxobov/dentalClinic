@@ -14,15 +14,19 @@ import clinicManagement.repository.DoctorRepository;
 import clinicManagement.repository.PatientRepository;
 import clinicManagement.repository.WorkingTimeRepository;
 import clinicManagement.service.AppointmentService;
+import clinicManagement.service.GlobalSettingsService;
 import clinicManagement.util.enums.AppointmentStatus;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +37,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final WorkingTimeRepository workingTimeRepository;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final GlobalSettingsService globalSettingsService;
 
     @Override
-    public ResponseEntity<ApiResponse<?>> booking(AppointmentDto appointmentDto,Long patientId,Long doctorId) {
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> booking(AppointmentDto appointmentDto, UUID patientId, UUID doctorId) {
        WorkingTimeEntity workingTimeEntity = workingTimeRepository.findByDoctorEntity_IdAndWorkingDate(doctorId,appointmentDto.getAppointmentDate()).orElseThrow(()->new AppBadException("not working time"));
        if(!appointmentDto.getStartTime().isBefore(workingTimeEntity.getBreakStart()) && !appointmentDto.getEndTime().isAfter(workingTimeEntity.getBreakEnd())){
            throw new AppBadException("break time");
@@ -43,9 +49,14 @@ public class AppointmentServiceImpl implements AppointmentService {
        if(appointmentRepository.existsByDoctorEntity_IdAndAppointmentDateAndStartTime(doctorId,appointmentDto.getAppointmentDate(),appointmentDto.getStartTime())){
            throw new AppBadException("booked time");
        }
-
        DoctorEntity doctorEntity = doctorRepository.findById(doctorId).orElseThrow(()-> new AppBadException("doctor not found"));
        PatientEntity patientEntity = patientRepository.findById(patientId).orElseThrow(()-> new AppBadException("patient not found"));
+       if(Duration.between(workingTimeEntity.getStartTime(),appointmentDto.getStartTime()).toMinutes()%globalSettingsService.getSlotDuration() != 0){
+           throw new AppBadException("invalid start time");
+       }
+       if(appointmentDto.getEndTime() != appointmentDto.getStartTime().plusMinutes(globalSettingsService.getSlotDuration())){
+              throw new AppBadException("invalid end time");
+       }
        AppointmentEntity appointmentEntity = AppointmentEntity.builder()
                .doctorEntity(doctorEntity)
                .patientEntity(patientEntity)
@@ -65,7 +76,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> getAllAppointmentsByDoctorId(Long doctorId) {
+    public ResponseEntity<ApiResponse<?>> getAllAppointmentsByDoctorId(UUID doctorId) {
         List<AppointmentEntity> appointmentEntityList = appointmentRepository.findAllByDoctorEntity_Id(doctorId);
         List<AppointmentResponseDto> responseDtoList = appointmentEntityList.stream().map(appointmentEntity -> appointmentMapper.toAppointmentResponseDto(appointmentEntity, doctorId)).toList();
        return ResponseEntity
@@ -74,7 +85,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> getAllAppointmentsByDoctorIdAndDate(Long doctorId, LocalDate date) {
+    public ResponseEntity<ApiResponse<?>> getAllAppointmentsByDoctorIdAndDate(UUID doctorId, LocalDate date) {
         List<AppointmentEntity> appointmentEntityList = appointmentRepository.findAllByDoctorEntity_IdAndAppointmentDate(doctorId,date);
         List<AppointmentResponseDto> responseDtoList = appointmentEntityList.stream().map(appointmentEntity -> appointmentMapper.toAppointmentResponseDto(appointmentEntity, doctorId)).toList();
         return ResponseEntity

@@ -1,6 +1,7 @@
 package clinicManagement.service.impl;
 
 import clinicManagement.dto.requestDto.LoginDto;
+import clinicManagement.dto.requestDto.ResetPasswordDto;
 import clinicManagement.dto.requestDto.UserDto;
 import clinicManagement.dto.requestDto.VerifyEmailDto;
 import clinicManagement.dto.responseDto.ApiResponse;
@@ -23,10 +24,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static clinicManagement.service.impl.EmailServiceImpl.generateVerificationCode;
 
@@ -57,100 +60,81 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> register(UserDto userDto) {
+    public void register(UserDto userDto) {
         String email = userDto.getEmail();
         Optional<UserEntity> optional = userRepository.findByEmail(email);
         if (optional.isPresent()) {
-            throw new AppBadException("user already registered");
+            throw new NotAcceptableException("User already registered with email " +  email);
         }
             String verificationCode = EmailServiceImpl.generateVerificationCode();
             emailService.sendVerificationCode(email, verificationCode);
             UserEntity userEntity = userMapper.toUserEntityForPatient(userDto, verificationCode);
             userRepository.save(userEntity);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(new ApiResponse<>("successfully registered", true, null, 201));
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> login(LoginDto loginDto) {
-        UserEntity userEntity = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new DataNotFoundException("user not found"));
+    public JwtResponseDto login(LoginDto loginDto) {
+        UserEntity userEntity = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new DataNotFoundException("User not found with email " + loginDto.getEmail()));
         if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), userEntity.getPassword())) {
-            throw new NotAcceptableException("invalid password");
+            throw new NotAcceptableException("Your password is not correct, please create right password!");
         }
         if(userEntity.getStatus() == UserStatus.NOT_ACTIVE){
-            throw new NotAcceptableException("email not verified");
+            throw new NotAcceptableException("User status is not active!");
         }
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>("successfully logged in", true,new JwtResponseDto(jwtTokenService.generateToken(userEntity)), 200));
+        return new JwtResponseDto(jwtTokenService.generateToken(userEntity));
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> verifyEmail(VerifyEmailDto verifyEmailDto) {
+    public void verifyEmail(VerifyEmailDto verifyEmailDto) {
         String email = verifyEmailDto.getEmail();
         String verificationCode = verifyEmailDto.getVerificationCode();
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("user not found"));
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found with email " + email));
         if (!userEntity.getVerificationCode().equals(verificationCode)) {
-            throw new NotAcceptableException("invalid verification code");
+            throw new NotAcceptableException("Verification code is not correct, please create right verification code!");
         }
-        if(LocalDateTime.now().isAfter(userEntity.getVerificationCodeGeneratedAt().plusMinutes(5))){
-            throw new NotAcceptableException("verification code expired");
+        if (LocalDateTime.now().isAfter(userEntity.getVerificationCodeGeneratedAt().plusMinutes(5))) {
+            throw new NotAcceptableException("Verification code expired, please create new verification code!");
         }
         userEntity.setStatus(UserStatus.ACTIVE);
         userRepository.save(userEntity);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>("email successfully verified", true, null, 200));
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> sendVerificationCodeForForgotPassword(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("user not found"));
+    @Transactional
+    public void sendVerificationCodeForForgotPassword(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found with email " + email));
         if (userEntity.getStatus() == UserStatus.NOT_ACTIVE) {
-            throw new NotAcceptableException("email not verified");
+            throw new NotAcceptableException("User status is not active!");
         }
         String verificationCode = EmailServiceImpl.generateVerificationCode();
         emailService.sendVerificationCode(email, verificationCode);
         userEntity.setVerificationCode(verificationCode);
         userEntity.setVerificationCodeGeneratedAt(LocalDateTime.now());
         userRepository.save(userEntity);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>("verification code sent to your email please check your email", true, null, 200));
     }
 
+    @Transactional
     @Override
-    public ResponseEntity<ApiResponse<?>> checkVerificationCodeForForgotPassword(VerifyEmailDto verifyEmailDto) {
-        String email = verifyEmailDto.getEmail();
-        String verificationCode = verifyEmailDto.getVerificationCode();
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("user not found"));
+    public void resetPassword(ResetPasswordDto  resetPasswordDto) {
+        UserEntity userEntity = userRepository.findByEmail(resetPasswordDto.getEmail()).orElseThrow(() -> new DataNotFoundException("user not found"));
         if (userEntity.getStatus() == UserStatus.NOT_ACTIVE) {
-            throw new NotAcceptableException("email NOT_ACTIVE");
+            throw new NotAcceptableException("email not verified");
         }
-        if (!userEntity.getVerificationCode().equals(verificationCode)) {
-            throw new AppBadException("invalid verification code");
+        if (!resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword())) {
+            throw new NotAcceptableException("passwords do not match");
         }
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>("verification code is valid", true, null, 200));
-    }
-
-    @Override
-    public ResponseEntity<ApiResponse<?>> changePassword(String email, String newPassword) {
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("user not found"));
-        if (userEntity.getStatus() == UserStatus.NOT_ACTIVE) {
-            throw new NotAcceptableException("user NOT_ACTIVE");
+        if (userEntity.getVerificationCode() == null ||!userEntity.getVerificationCode().equals(resetPasswordDto.getVerificationCode())) {
+            throw new NotAcceptableException("invalid verification code");
         }
-        userEntity.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        if (LocalDateTime.now().isAfter(userEntity.getVerificationCodeGeneratedAt().plusMinutes(3))) {
+            throw new NotAcceptableException("verification code expired");
+        }
+        userEntity.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getNewPassword()));
         userRepository.save(userEntity);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>("password successfully changed", true, null, 200));
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> findById(Long id) {
+    public ResponseEntity<ApiResponse<?>> findById(UUID id) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("user not found"));
         return ResponseEntity
                 .status(HttpStatus.OK)

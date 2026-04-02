@@ -6,9 +6,11 @@ import clinicManagement.util.enums.DoctorStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public interface DoctorService {
-    ResponseEntity<ApiResponse<?>> createDoctor(DoctorDto doctorDto,Long employeeId);
-    ResponseEntity<ApiResponse<?>> updateDoctor(DoctorDto doctorDto,Long employeeId);
-    ResponseEntity<ApiResponse<?>> changeStatus(DoctorStatus status,Long employeeId);
+    ResponseEntity<ApiResponse<?>> createDoctor(DoctorDto doctorDto, UUID employeeId);
+    ResponseEntity<ApiResponse<?>> updateDoctor(DoctorDto doctorDto, UUID employeeId);
+    ResponseEntity<ApiResponse<?>> changeStatus(DoctorStatus status, UUID employeeId);
 }

@@ -20,19 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class GlobalSettingsServiceImpl implements GlobalSettingsService {
     private final GlobalSettingsRepository globalSettingsRepository;
     private final GlobalSettingMapper globalSettingMapper;
-    private final DoctorRepository doctorRepository;
     private final WorkingTimeRepository workingTimeRepository;
 
     @Override
     @Transactional
     public ResponseEntity<ApiResponse<?>> addGlobalSetting(GlobalSettingDto globalSettingDto) {
-        globalSettingsRepository.save(globalSettingMapper.toGlobalSettingsEntity(globalSettingDto));
+        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findTopBy().orElse(new GlobalSettingsEntity());
+        globalSettingsRepository.save(globalSettingMapper.toGlobalSettingsEntity(globalSettingDto, globalSettingsEntity));
         List<WorkingTimeEntity> doctorEntity = workingTimeRepository.findAll();
         doctorEntity.forEach(wt -> {
             wt.setBreakStart(globalSettingDto.getBreakStart());
@@ -44,9 +45,10 @@ public class GlobalSettingsServiceImpl implements GlobalSettingsService {
                 .body(new ApiResponse<>("global setting created",true,null,201));
     }
 
+
     @Override
     public ResponseEntity<ApiResponse<?>> getGlobalSetting() {
-              GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findById(1L).orElseThrow(()->new AppBadException("global settings not found"));
+              GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findTopBy().orElseThrow(()->new AppBadException("global settings not found"));
                return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>("global settings",true,globalSettingMapper.toGlobalSettingResponseDto(globalSettingsEntity),200));
@@ -54,26 +56,26 @@ public class GlobalSettingsServiceImpl implements GlobalSettingsService {
 
     @Override
     public LocalTime getBreakStartTime() {
-       GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findById(1L).orElseThrow(() -> new AppBadException("global settings not found"));
+       GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findTopBy().orElseThrow(() -> new AppBadException("global settings not found"));
         return globalSettingsEntity.getBreakStart();
     }
 
     @Override
     public LocalTime getBreakEndTime() {
-        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findById(1L).orElseThrow(() -> new AppBadException("global settings not found"));
+        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findTopBy().orElseThrow(() -> new AppBadException("global settings not found"));
         return globalSettingsEntity.getBreakEnd();
     }
 
     @Override
     public Integer getSlotDuration() {
-        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findById(1L).orElseThrow(() -> new AppBadException("global settings not found"));
+        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findTopBy().orElseThrow(() -> new AppBadException("global settings not found"));
         return globalSettingsEntity.getSlotDuration();
     }
 
 
     @Override
     public String getReason() {
-        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findById(1L).orElseThrow(() -> new AppBadException("global settings not found"));
+        GlobalSettingsEntity globalSettingsEntity = globalSettingsRepository.findTopBy().orElseThrow(() -> new AppBadException("global settings not found"));
         return globalSettingsEntity.getReason();
     }
 }

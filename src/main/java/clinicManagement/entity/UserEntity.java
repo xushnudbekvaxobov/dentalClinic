@@ -20,11 +20,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false,updatable = false)
-    private Long id;
+public class UserEntity extends BaseEntity implements UserDetails {
     @Column(nullable = false,unique = true)
     private String email;
     @Column(nullable = false)
@@ -32,10 +28,6 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
-    @Column( nullable = false,updatable = false)
-    private LocalDate createdAt;
-    @Column( nullable = false)
-    private LocalDate updatedAt;
     private String verificationCode;
     private LocalDateTime verificationCodeGeneratedAt;
     @Enumerated(EnumType.STRING)
@@ -53,9 +45,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public List<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority(role.name()));
-        return roles;
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -65,21 +55,21 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return isAccountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return isAccountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return isCredentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }

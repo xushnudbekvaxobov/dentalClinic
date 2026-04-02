@@ -5,6 +5,8 @@ import clinicManagement.util.enums.EmployeeType;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,14 +14,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class EmployeeResponseDto {
-    public Long id;
-    public String fullName;
+    public UUID id;
+    public String firstName;
+    public String lastName;
     public LocalDate birthDate;
     public String gender;
     public String phone;
     public String address;
-    public LocalDate createdAt;
+    public LocalDateTime createdAt;
     private EmployeeType employeeType;
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
     private EmployeeStatus employeeStatus;
+    private UserResponseDto userResponseDto;
 }

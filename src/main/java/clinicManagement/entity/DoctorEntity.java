@@ -7,16 +7,13 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "doctor")
+@Table(name = "doctors")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DoctorEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class DoctorEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employeeEntity;

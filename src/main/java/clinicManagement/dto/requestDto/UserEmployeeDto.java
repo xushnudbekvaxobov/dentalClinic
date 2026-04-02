@@ -10,12 +10,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserEmployeeDto {
-    @NotBlank(message = "email is can't be empty")
-    @Email(message = "invalid email address")
+    @NotBlank(message = "Email is can't be empty!")
+    @Email(message = "Invalid email address!")
     private String email;
-    @NotBlank(message = "password is can't be empty")
-    @Size(min = 8,max = 8,message = "password should be 8 symbols")
+    @NotBlank(message = "Password is can't be empty!")
+    @Size(min = 8,max = 10,message = "Password should be between 8 and 10 characters!")
     private String password;
-
     private UserRole role;
 }

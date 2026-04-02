@@ -8,16 +8,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "working_time")
+@Table(name = "working_times")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkingTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class WorkingTimeEntity extends BaseEntity{
     @ManyToOne(fetch  = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private DoctorEntity doctorEntity;

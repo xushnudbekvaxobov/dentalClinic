@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/catalog")
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class CatalogController {
     }
 
     @PutMapping("/update/{catalogId}")
-    public ResponseEntity<ApiResponse<?>> updateCatalog(@PathVariable Long catalogId,@RequestBody CatalogDto catalogDto){
+    public ResponseEntity<ApiResponse<?>> updateCatalog(@PathVariable UUID catalogId,@RequestBody CatalogDto catalogDto){
         return catalogService.updateCatalog(catalogId,catalogDto);
     }
     @GetMapping("/get-all")

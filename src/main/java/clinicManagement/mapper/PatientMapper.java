@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @Getter
@@ -21,12 +22,13 @@ public class PatientMapper {
 
     public PatientEntity toEntity(PatientDto patientDto, UserEntity user) {
         PatientEntity patientEntity = new PatientEntity();
-        patientEntity.setFullName(patientDto.getFullName());
+        patientEntity.setFirstName(patientDto.getFirstName());
+        patientEntity.setLastName(patientDto.getLastName());
         patientEntity.setBirthDate(patientDto.getBirthDate());
         patientEntity.setGender(patientDto.getGender());
         patientEntity.setPhone(patientDto.getPhone());
         patientEntity.setAddress(patientDto.getAddress());
-        patientEntity.setCreatedAt(LocalDate.now());
+        patientEntity.setCreatedAt(LocalDateTime.now());
         patientEntity.setAllergies(patientDto.getAllergies());
         patientEntity.setUser(user);
         return patientEntity;

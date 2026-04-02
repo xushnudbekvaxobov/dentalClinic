@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/slot")
@@ -19,7 +20,7 @@ public class TimeSlotController {
     private final TimeSlotService timeSlotService;
 
     @GetMapping("/get-slots")
-    public ResponseEntity<ApiResponse<?>> getSlots(@RequestParam Long doctorId,@RequestParam LocalDate date){
+    public ResponseEntity<ApiResponse<?>> getSlots(@RequestParam UUID doctorId,@RequestParam LocalDate date){
         return timeSlotService.getTimeSlotsByDoctorId(doctorId,date);
     }
 }

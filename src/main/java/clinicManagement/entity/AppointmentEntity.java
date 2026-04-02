@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "appointment",
+@Table(name = "appointments",
 uniqueConstraints = @UniqueConstraint(
         columnNames = {"doctor_id","appointmentDate", "startTime"}
 ))
@@ -17,10 +17,7 @@ uniqueConstraints = @UniqueConstraint(
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AppointmentEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class AppointmentEntity extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id")
     private DoctorEntity doctorEntity;

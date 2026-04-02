@@ -9,28 +9,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "catalog")
+@Table(name = "catalogs")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CatalogEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class CatalogEntity extends BaseEntity{
     @Column(nullable = false)
     private String name;
     @Column(length = 1000)
     private String description;
     @Column(nullable = false)
     private BigDecimal basePrice;
-    @CreationTimestamp
-    @Column(nullable = false,updatable = false)
-    private LocalDate createdAt;
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDate updatedAt;
     @Column(nullable = false)
     private Boolean isActive;
 

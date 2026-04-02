@@ -4,9 +4,11 @@ import clinicManagement.dto.responseDto.AppointmentResponseDto;
 import clinicManagement.entity.AppointmentEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class AppointmentMapper {
-    public AppointmentResponseDto toAppointmentResponseDto(AppointmentEntity appointmentEntity,Long doctorId){
+    public AppointmentResponseDto toAppointmentResponseDto(AppointmentEntity appointmentEntity, UUID doctorId){
         return AppointmentResponseDto.builder()
                 .doctorId(doctorId)
                 .patientId(appointmentEntity.getPatientEntity().getId())

@@ -3,6 +3,7 @@ package clinicManagement.service.impl;
 import clinicManagement.dto.responseDto.ApiResponse;
 import clinicManagement.dto.responseDto.TimeSlotResponseDto;
 import clinicManagement.entity.AppointmentEntity;
+import clinicManagement.entity.GlobalSettingsEntity;
 import clinicManagement.entity.WorkingTimeEntity;
 import clinicManagement.exception.AppBadException;
 import clinicManagement.repository.AppointmentRepository;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,76 +31,48 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private final AppointmentRepository appointmentRepository;
 
     @Override
-    public ResponseEntity<ApiResponse<?>> getTimeSlotsByDoctorId(Long doctorId, LocalDate date) {
+    public ResponseEntity<ApiResponse<?>> getTimeSlotsByDoctorId(UUID doctorId, LocalDate date) {
       WorkingTimeEntity workingTimeEntity = workingTimeRepository.findByDoctorEntity_IdAndWorkingDate(doctorId,date)
               .orElseThrow(()-> new AppBadException("not marked working day or this day holiday"));
-
-        LocalTime current = workingTimeEntity.getStartTime();
-        LocalTime workEnd = workingTimeEntity.getEndTime();
-        LocalTime breakStart = workingTimeEntity.getBreakStart();
-        LocalTime breakEnd = workingTimeEntity.getBreakEnd();
-        Integer slotDuration = globalSettingsService.getSlotDuration();
-
         List<AppointmentEntity> appointmentEntity = appointmentRepository.findAllByDoctorEntity_IdAndAppointmentDate(doctorId,date);
         List<LocalTime> bookedStartTime = appointmentEntity.stream().map(AppointmentEntity::getStartTime).toList();
-        List<TimeSlotResponseDto> slotResponseDtoList = new ArrayList<>();
-        while (current.isBefore(workEnd)){
-            LocalTime slotEnd = current.plusMinutes(slotDuration);
-            if (current.isBefore(breakStart) && Duration.between(slotEnd, breakStart).toMinutes() < slotDuration) {
-                slotEnd = breakStart;
-            }
-
-            if (current.isAfter(breakEnd) && Duration.between(slotEnd, workEnd).toMinutes() < slotDuration) {
-                slotEnd = workEnd;
-            }
-
-            AppointmentStatus status;               // bt 12  13  ;       11
-            if (!current.isBefore(breakStart) && current.isBefore(breakEnd)){
-                status = AppointmentStatus.BREAK;
-                slotEnd = breakEnd;
-            }else if (bookedStartTime.contains(current)){
-                status=AppointmentStatus.BOOKED;
-            }else {
-                status = AppointmentStatus.AVAILABLE;
-            }
-         slotResponseDtoList.add(TimeSlotResponseDto.builder()
-                            .startTime(current)
-                            .endTime(slotEnd)
-                            .status(status)
-                            .build());
-            current = slotEnd;
-        }
+        List<TimeSlotResponseDto> slotResponseDtoList = generateSlot(workingTimeEntity,bookedStartTime);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>("getting slots",true,slotResponseDtoList,200));
     }
+
+    private List<TimeSlotResponseDto> generateSlot(WorkingTimeEntity workingTimeEntity,
+                                                   List<LocalTime> bookedStartTime){
+        LocalTime current = workingTimeEntity.getStartTime();
+        int slotDuration = globalSettingsService.getSlotDuration();
+        LocalTime breakStart = workingTimeEntity.getBreakStart();
+        LocalTime breakEnd = workingTimeEntity.getBreakEnd();
+        LocalTime endTime = workingTimeEntity.getEndTime();
+
+// ...existing code...
+        AppointmentStatus status;
+        List<TimeSlotResponseDto> timeSlotResponseDtoList = new ArrayList<>();
+        while(current.isBefore(endTime)){
+            LocalTime slotEnd = current.plusMinutes(slotDuration);
+            if(current.isBefore(breakStart) && Duration.between(slotEnd,breakStart).toMinutes() < slotDuration){
+                slotEnd = breakStart;
+            }
+            if(!current.isBefore(breakEnd) && Duration.between(slotEnd,endTime).toMinutes() < slotDuration){
+                slotEnd = endTime;
+            }
+            if(!current.isBefore(breakStart) && !slotEnd.isAfter(breakEnd)) {
+                slotEnd = breakEnd;
+                status = AppointmentStatus.BREAK;
+            }else if(bookedStartTime.contains(current)){
+                status = AppointmentStatus.BOOKED;
+            }
+            else {
+                status = AppointmentStatus.AVAILABLE;
+            }
+            timeSlotResponseDtoList.add(new TimeSlotResponseDto(current,slotEnd,status));
+            current = slotEnd;
+        }
+        return timeSlotResponseDtoList;
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -6,15 +6,13 @@ import lombok.*;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "global_setting")
+@Table(name = "global_settings")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GlobalSettingsEntity {
-    @Id
-    private Long id;
+public class GlobalSettingsEntity extends BaseEntity {
     private LocalTime breakStart;
     private LocalTime breakEnd;
     private String reason;

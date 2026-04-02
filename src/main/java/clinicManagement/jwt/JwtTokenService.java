@@ -29,7 +29,7 @@ public class JwtTokenService {
         return Jwts
                 .builder()
                 .subject(userEntity.getEmail())
-                .claim("roles", userEntity.getAuthorities())
+                .claim("roles", userEntity.getRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis()+expiration))
                 .signWith(getSignKey())
@@ -43,8 +43,8 @@ public class JwtTokenService {
                 .parseSignedClaims(token)
                 .getPayload();
         String username = claims.getSubject();
-        List<SimpleGrantedAuthority> roles = claims.get("roles", List.class);
-        return new JwtDto(username, roles);
+        String role = claims.get("roles", String.class);
+        return new JwtDto(username, role);
     }
 
 

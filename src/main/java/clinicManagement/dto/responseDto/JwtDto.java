@@ -14,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 public class JwtDto {
     private String username;
-    private List<SimpleGrantedAuthority> roles;
+    private String roles;
 }

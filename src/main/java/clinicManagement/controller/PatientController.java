@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("patient")
 public class PatientController {
@@ -19,13 +21,13 @@ public class PatientController {
     @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @PostMapping("/create-patient")
     public ResponseEntity<ApiResponse<?>> addPatient(@RequestBody PatientDto patientDto,
-                                                     @RequestParam Long userId) {
+                                                     @RequestParam UUID userId) {
         return patientService.addPatient(patientDto,userId);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<?>> update(@RequestBody PatientDto patientDto, Long userId) {
+    public ResponseEntity<ApiResponse<?>> update(@RequestBody PatientDto patientDto, UUID userId) {
         return patientService.updatePatient(patientDto, userId);
     }
 
@@ -38,7 +40,7 @@ public class PatientController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @GetMapping("/get-by-id/{id}")
-    public ResponseEntity<ApiResponse<?>> getById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<?>> getById(@PathVariable UUID id) {
         return patientService.getById(id);
     }
 
