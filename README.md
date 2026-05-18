@@ -2,10 +2,13 @@
 
 📌 Description
 
-Dental Clinic Backend is a complete backend API system for managing dental clinic operations.  
-The system provides functionality for managing doctors, patients, appointments, services, treatment records, and user authentication.
+Dental Clinic Backend is a RESTful backend API for managing dental clinic operations.
 
-It includes secure JWT-based authentication, role-based access control, email verification, appointment scheduling, image/file management, and RESTful API endpoints.
+The system allows patients to book appointments in advance and also supports walk-in patient registration for patients who come directly to the clinic without prior booking.
+
+It provides complete functionality for managing doctors, patients, appointments, dental services, treatment records, clinic schedules, and user authentication.
+
+The system includes secure JWT-based authentication, role-based access control, email verification, PostgreSQL database integration, Flyway migrations, and Swagger API documentation.
 
 ---
 
